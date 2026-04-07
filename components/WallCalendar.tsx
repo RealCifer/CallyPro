@@ -228,8 +228,71 @@ export default function WallCalendar() {
             </h1>
           </header>
 
-          <div className="grid gap-4 md:grid-cols-[180px_1fr]">
-            <aside className="rounded-lg border border-neutral-200 bg-white p-3">
+          <div className="grid gap-5 md:grid-cols-[1fr_220px] md:gap-4">
+            <div className="rounded-lg border border-neutral-200 bg-white p-3 sm:p-4">
+              <div className="mb-3 grid grid-cols-7 gap-2 sm:gap-3">
+                {weekdayLabels.map((label, weekdayIndex) => (
+                  <div
+                    key={label}
+                    className={[
+                      "text-center text-xs font-medium uppercase tracking-wide",
+                      weekdayIndex >= 5 ? "text-neutral-400" : "text-neutral-500",
+                    ].join(" ")}
+                  >
+                    {label}
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-7 gap-2 sm:gap-3">
+                {calendarDays.map(({ date, isCurrentMonth }) => {
+                  const normalizedDate = normalizeDate(date);
+                  const isToday =
+                    date.getDate() === now.getDate() &&
+                    date.getMonth() === now.getMonth() &&
+                    date.getFullYear() === now.getFullYear();
+                  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                  const isStartDate = isSameDate(startDate, normalizedDate);
+                  const isEndDate = isSameDate(endDate, normalizedDate);
+                  const hasRange = Boolean(startDate && endDate);
+                  const isInRange = Boolean(
+                    hasRange &&
+                      startDate &&
+                      endDate &&
+                      normalizedDate > normalizeDate(startDate) &&
+                      normalizedDate < normalizeDate(endDate),
+                  );
+
+                  return (
+                    <button
+                      key={date.toISOString()}
+                      type="button"
+                      onClick={() => handleDateClick(date)}
+                      className={[
+                        "aspect-square min-h-[44px] rounded-md border text-base transition-colors duration-150 md:min-h-0 md:text-sm",
+                        isStartDate || isEndDate
+                          ? "border-blue-600 bg-blue-500 font-semibold text-white"
+                          : "border-neutral-200 bg-white text-neutral-800 hover:bg-neutral-100",
+                        isInRange ? "border-blue-100 bg-blue-50 text-blue-800" : "",
+                        isWeekend && !isToday && !isInRange && !isStartDate && !isEndDate
+                          ? "bg-neutral-50/70"
+                          : "",
+                        isToday && !isStartDate && !isEndDate
+                          ? "border-blue-400 font-semibold text-blue-700"
+                          : "",
+                        !isCurrentMonth && !isToday && !isStartDate && !isEndDate && !isInRange
+                          ? "text-neutral-400"
+                          : "",
+                      ].join(" ")}
+                    >
+                      {date.getDate()}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <aside className="rounded-lg border border-neutral-200 bg-white p-3 sm:p-4">
               <div className="mb-2 flex items-start justify-between gap-3">
                 <div>
                   <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-700">
@@ -264,7 +327,7 @@ export default function WallCalendar() {
                 onChange={(e) => setNotesText(e.target.value)}
                 disabled={!activeRangeKey}
                 className={[
-                  "min-h-44 w-full resize-none rounded-md border p-2 text-sm outline-none transition-shadow placeholder:text-neutral-400",
+                  "min-h-40 w-full resize-none rounded-md border p-2 text-sm outline-none transition-shadow placeholder:text-neutral-400 sm:min-h-44",
                   activeRangeKey
                     ? "border-neutral-200 bg-neutral-50 text-neutral-700 focus:border-neutral-300 focus:ring-2 focus:ring-neutral-200"
                     : "cursor-not-allowed border-neutral-200 bg-neutral-100 text-neutral-500",
@@ -274,69 +337,6 @@ export default function WallCalendar() {
                 }
               />
             </aside>
-
-            <div className="rounded-lg border border-neutral-200 bg-white p-3">
-              <div className="mb-2 grid grid-cols-7 gap-2">
-                {weekdayLabels.map((label, weekdayIndex) => (
-                  <div
-                    key={label}
-                    className={[
-                      "text-center text-xs font-medium uppercase tracking-wide",
-                      weekdayIndex >= 5 ? "text-neutral-400" : "text-neutral-500",
-                    ].join(" ")}
-                  >
-                    {label}
-                  </div>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-7 gap-2">
-                {calendarDays.map(({ date, isCurrentMonth }) => {
-                  const normalizedDate = normalizeDate(date);
-                  const isToday =
-                    date.getDate() === now.getDate() &&
-                    date.getMonth() === now.getMonth() &&
-                    date.getFullYear() === now.getFullYear();
-                  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-                  const isStartDate = isSameDate(startDate, normalizedDate);
-                  const isEndDate = isSameDate(endDate, normalizedDate);
-                  const hasRange = Boolean(startDate && endDate);
-                  const isInRange = Boolean(
-                    hasRange &&
-                      startDate &&
-                      endDate &&
-                      normalizedDate > normalizeDate(startDate) &&
-                      normalizedDate < normalizeDate(endDate),
-                  );
-
-                  return (
-                    <button
-                      key={date.toISOString()}
-                      type="button"
-                      onClick={() => handleDateClick(date)}
-                      className={[
-                        "aspect-square rounded-md border text-sm transition-colors duration-150",
-                        isStartDate || isEndDate
-                          ? "border-blue-600 bg-blue-500 font-semibold text-white"
-                          : "border-neutral-200 bg-white text-neutral-800 hover:bg-neutral-100",
-                        isInRange ? "border-blue-100 bg-blue-50 text-blue-800" : "",
-                        isWeekend && !isToday && !isInRange && !isStartDate && !isEndDate
-                          ? "bg-neutral-50/70"
-                          : "",
-                        isToday && !isStartDate && !isEndDate
-                          ? "border-blue-400 font-semibold text-blue-700"
-                          : "",
-                        !isCurrentMonth && !isToday && !isStartDate && !isEndDate && !isInRange
-                          ? "text-neutral-400"
-                          : "",
-                      ].join(" ")}
-                    >
-                      {date.getDate()}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
           </div>
         </div>
       </div>
