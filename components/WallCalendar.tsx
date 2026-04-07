@@ -54,7 +54,9 @@ export default function WallCalendar() {
   const calendarDays = generateCalendarDays(currentMonth, currentYear);
 
   return (
-    <section className="mx-auto w-full max-w-6xl rounded-3xl border border-neutral-200 bg-white p-4 shadow-[0_12px_26px_rgba(0,0,0,0.08)] sm:p-6 lg:p-8">
+    <section className="relative mx-auto w-full max-w-6xl rounded-3xl border border-neutral-200 bg-white p-4 shadow-[0_12px_26px_rgba(0,0,0,0.08)] sm:p-6 lg:p-8">
+      <div className="pointer-events-none absolute -top-3 left-8 h-6 w-16 rounded-full border border-neutral-300 bg-neutral-100 shadow-sm" />
+      <div className="pointer-events-none absolute -top-3 right-8 h-6 w-16 rounded-full border border-neutral-300 bg-neutral-100 shadow-sm" />
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:items-stretch">
         <div className="relative min-h-64 overflow-hidden rounded-2xl bg-neutral-100 shadow-[0_6px_18px_rgba(0,0,0,0.1)] sm:min-h-80 lg:min-h-full">
           <Image
@@ -93,10 +95,13 @@ export default function WallCalendar() {
 
             <div className="rounded-lg border border-neutral-200 bg-white p-3">
               <div className="mb-2 grid grid-cols-7 gap-2">
-                {weekdayLabels.map((label) => (
+                {weekdayLabels.map((label, weekdayIndex) => (
                   <div
                     key={label}
-                    className="text-center text-xs font-medium uppercase tracking-wide text-neutral-500"
+                    className={[
+                      "text-center text-xs font-medium uppercase tracking-wide",
+                      weekdayIndex >= 5 ? "text-neutral-400" : "text-neutral-500",
+                    ].join(" ")}
                   >
                     {label}
                   </div>
@@ -109,6 +114,7 @@ export default function WallCalendar() {
                     date.getDate() === now.getDate() &&
                     date.getMonth() === now.getMonth() &&
                     date.getFullYear() === now.getFullYear();
+                  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
 
                   return (
                     <button
@@ -119,6 +125,7 @@ export default function WallCalendar() {
                         isToday
                           ? "border-blue-400 bg-blue-50 font-semibold text-blue-700"
                           : "border-neutral-200 bg-white text-neutral-800 hover:bg-neutral-100",
+                        isWeekend && !isToday ? "bg-neutral-50/70" : "",
                         !isCurrentMonth && !isToday ? "text-neutral-400" : "",
                       ].join(" ")}
                     >
