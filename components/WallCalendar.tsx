@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 
 const weekdayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -44,6 +47,8 @@ export default function WallCalendar() {
   const now = new Date();
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
   const monthYear = now.toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
@@ -52,6 +57,42 @@ export default function WallCalendar() {
     .toLocaleDateString("en-US", { month: "long", year: "numeric" })
     .toUpperCase();
   const calendarDays = generateCalendarDays(currentMonth, currentYear);
+
+  const normalizeDate = (date: Date) =>
+    new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+  const isSameDate = (a: Date | null, b: Date | null) =>
+    Boolean(a && b && normalizeDate(a).getTime() === normalizeDate(b).getTime());
+
+  const handleDateClick = (clickedDate: Date) => {
+    const normalizedClickedDate = normalizeDate(clickedDate);
+
+    if (!startDate) {
+      setStartDate(normalizedClickedDate);
+      setEndDate(null);
+      return;
+    }
+
+    if (!endDate) {
+      if (isSameDate(startDate, normalizedClickedDate)) {
+        setStartDate(normalizedClickedDate);
+        setEndDate(normalizedClickedDate);
+        return;
+      }
+
+      if (normalizedClickedDate < normalizeDate(startDate)) {
+        setStartDate(normalizedClickedDate);
+        setEndDate(normalizeDate(startDate));
+        return;
+      }
+
+      setEndDate(normalizedClickedDate);
+      return;
+    }
+
+    setStartDate(normalizedClickedDate);
+    setEndDate(null);
+  };
 
   return (
     <section className="relative mx-auto w-full max-w-6xl rounded-3xl border border-neutral-200 bg-white p-4 shadow-[0_12px_26px_rgba(0,0,0,0.08)] sm:p-6 lg:p-8">
@@ -110,23 +151,43 @@ export default function WallCalendar() {
 
               <div className="grid grid-cols-7 gap-2">
                 {calendarDays.map(({ date, isCurrentMonth }) => {
+                  const normalizedDate = normalizeDate(date);
                   const isToday =
                     date.getDate() === now.getDate() &&
                     date.getMonth() === now.getMonth() &&
                     date.getFullYear() === now.getFullYear();
                   const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                  const isStartDate = isSameDate(startDate, normalizedDate);
+                  const isEndDate = isSameDate(endDate, normalizedDate);
+                  const hasRange = Boolean(startDate && endDate);
+                  const isInRange = Boolean(
+                    hasRange &&
+                      startDate &&
+                      endDate &&
+                      normalizedDate > normalizeDate(startDate) &&
+                      normalizedDate < normalizeDate(endDate),
+                  );
 
                   return (
                     <button
                       key={date.toISOString()}
                       type="button"
+                      onClick={() => handleDateClick(date)}
                       className={[
                         "aspect-square rounded-md border text-sm transition-colors duration-150",
-                        isToday
-                          ? "border-blue-400 bg-blue-50 font-semibold text-blue-700"
+                        isStartDate || isEndDate
+                          ? "border-blue-600 bg-blue-500 font-semibold text-white"
                           : "border-neutral-200 bg-white text-neutral-800 hover:bg-neutral-100",
-                        isWeekend && !isToday ? "bg-neutral-50/70" : "",
-                        !isCurrentMonth && !isToday ? "text-neutral-400" : "",
+                        isInRange ? "border-blue-100 bg-blue-50 text-blue-800" : "",
+                        isWeekend && !isToday && !isInRange && !isStartDate && !isEndDate
+                          ? "bg-neutral-50/70"
+                          : "",
+                        isToday && !isStartDate && !isEndDate
+                          ? "border-blue-400 font-semibold text-blue-700"
+                          : "",
+                        !isCurrentMonth && !isToday && !isStartDate && !isEndDate && !isInRange
+                          ? "text-neutral-400"
+                          : "",
                       ].join(" ")}
                     >
                       {date.getDate()}
