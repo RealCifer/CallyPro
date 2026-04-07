@@ -129,6 +129,8 @@ export default function WallCalendar() {
   );
   const [isMonthAnimating, setIsMonthAnimating] = useState(false);
   const [monthSlideDirection, setMonthSlideDirection] = useState<1 | -1>(1);
+  const [flipAnimationEnabled, setFlipAnimationEnabled] = useState(true);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [notesText, setNotesText] = useState("");
@@ -189,7 +191,7 @@ export default function WallCalendar() {
     globalThis.setTimeout(() => {
       setDisplayedDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + direction, 1));
       setIsMonthAnimating(false);
-    }, 120);
+    }, 150);
   };
 
   const activeRange = useMemo(() => {
@@ -227,6 +229,11 @@ export default function WallCalendar() {
   if (isMonthAnimating) {
     monthAnimationClass = monthSlideDirection === 1 ? "translate-x-1 opacity-30" : "-translate-x-1 opacity-30";
   }
+  const shouldFlipAnimate = flipAnimationEnabled && !prefersReducedMotion;
+  const flipAnimationClass =
+    shouldFlipAnimate && isMonthAnimating
+      ? "[transform:perspective(1000px)_rotateX(8deg)]"
+      : "[transform:perspective(1000px)_rotateX(0deg)]";
 
   const saveNotesForActiveRange = () => {
     if (!activeRangeKey) return;
@@ -268,6 +275,18 @@ export default function WallCalendar() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notesText, activeRangeKey]);
 
+  useEffect(() => {
+    if (globalThis.window === undefined) return;
+    const mediaQuery = globalThis.window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onMotionPreferenceChange = () => {
+      setPrefersReducedMotion(mediaQuery.matches);
+    };
+
+    onMotionPreferenceChange();
+    mediaQuery.addEventListener("change", onMotionPreferenceChange);
+    return () => mediaQuery.removeEventListener("change", onMotionPreferenceChange);
+  }, []);
+
   return (
     <section className="relative mx-auto w-full max-w-6xl rounded-3xl border border-neutral-200 bg-white p-4 shadow-[0_12px_26px_rgba(0,0,0,0.08)] sm:p-6 lg:p-8">
       <div className="pointer-events-none absolute -top-3 left-8 h-6 w-16 rounded-full border border-neutral-300 bg-neutral-100 shadow-sm" />
@@ -299,6 +318,28 @@ export default function WallCalendar() {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
+                  onClick={() => setFlipAnimationEnabled((prev) => !prev)}
+                  className={[
+                    "inline-flex h-9 w-9 items-center justify-center rounded-md border border-neutral-200 bg-white text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 md:hidden",
+                    prefersReducedMotion ? "opacity-60" : "",
+                  ].join(" ")}
+                  aria-label={flipAnimationEnabled ? "Disable flip animation" : "Enable flip animation"}
+                  title={flipAnimationEnabled ? "Flip on" : "Flip off"}
+                >
+                  {flipAnimationEnabled ? "F" : "f"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFlipAnimationEnabled((prev) => !prev)}
+                  className={[
+                    "hidden h-9 rounded-md border border-neutral-200 bg-white px-3 text-xs font-medium text-neutral-700 transition-colors hover:bg-neutral-100 md:inline-flex md:items-center",
+                    prefersReducedMotion ? "opacity-60" : "",
+                  ].join(" ")}
+                >
+                  Flip: {flipAnimationEnabled ? "On" : "Off"}
+                </button>
+                <button
+                  type="button"
                   onClick={() => handleMonthChange(-1)}
                   disabled={isMonthAnimating}
                   className="h-9 w-9 rounded-md border border-neutral-200 bg-white text-neutral-700 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
@@ -322,8 +363,9 @@ export default function WallCalendar() {
           <div className="grid gap-5 md:grid-cols-[1fr_220px] md:gap-4">
             <div
               className={[
-                "rounded-lg border border-neutral-200 bg-white p-3 transition-all duration-200 sm:p-4",
+                "rounded-lg border border-neutral-200 bg-white p-3 transition-all duration-200 will-change-transform sm:p-4",
                 monthAnimationClass,
+                flipAnimationClass,
               ].join(" ")}
             >
               <div className="mb-3 grid grid-cols-7 gap-2 sm:gap-3">
@@ -365,7 +407,8 @@ export default function WallCalendar() {
                       type="button"
                       onClick={() => handleDateClick(date)}
                       className={[
-                        "relative aspect-square min-h-[44px] rounded-md border text-base transition duration-150 hover:scale-[1.03] active:scale-[0.98] md:min-h-0 md:text-sm",
+                        "relative aspect-square min-h-[44px] rounded-md border text-base transition duration-150 md:min-h-0 md:text-sm",
+                        prefersReducedMotion ? "" : "hover:scale-[1.03] active:scale-[0.98]",
                         isStartDate || isEndDate
                           ? accentTheme.selected
                           : "border-neutral-200 bg-white text-neutral-800 hover:bg-neutral-100",
