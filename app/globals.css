@@ -24,3 +24,64 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Tear-off calendar: subtle peel + perforation (respect reduced motion) */
+@keyframes tear-peel-corner {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+  45% {
+    transform: rotate(-5deg) translateY(3px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+  }
+}
+
+@keyframes perforation-flow {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 12px 0;
+  }
+}
+
+@keyframes tear-edge-wiggle {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(1px);
+  }
+}
+
+.tear-off-peel {
+  transform-origin: 100% 100%;
+  animation: tear-peel-corner 2.8s ease-in-out infinite;
+}
+
+.tear-off-perf {
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 5px,
+    rgb(212 212 212) 5px,
+    rgb(212 212 212) 7px
+  );
+  background-size: 12px 2px;
+  animation: perforation-flow 1.2s linear infinite;
+}
+
+.tear-off-edge-wiggle {
+  animation: tear-edge-wiggle 3.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tear-off-peel,
+  .tear-off-perf,
+  .tear-off-edge-wiggle {
+    animation: none;
+  }
+}

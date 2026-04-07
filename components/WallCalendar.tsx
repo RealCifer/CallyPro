@@ -308,7 +308,44 @@ export default function WallCalendar() {
           </div>
         </div>
 
-        <div className="rounded-b-xl bg-white px-2 pb-2 pt-4 sm:px-3">
+        <div
+          className={[
+            "relative z-[2] -mt-[10px] w-full drop-shadow-[0_4px_0_rgba(0,0,0,0.05)]",
+            prefersReducedMotion ? "" : "tear-off-edge-wiggle",
+          ].join(" ")}
+          aria-hidden
+        >
+          <svg
+            className="block h-[12px] w-full text-white sm:h-[14px]"
+            viewBox="0 0 600 12"
+            preserveAspectRatio="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>Torn paper edge</title>
+            <path
+              fill="currentColor"
+              d="M0 0v6l7.5 6L15 6l7.5 6L30 6l7.5 6L45 6l7.5 6L60 6l7.5 6L75 6l7.5 6L90 6l7.5 6L105 6l7.5 6L120 6l7.5 6L135 6l7.5 6L150 6l7.5 6L165 6l7.5 6L180 6l7.5 6L195 6l7.5 6L210 6l7.5 6L225 6l7.5 6L240 6l7.5 6L255 6l7.5 6L270 6l7.5 6L285 6l7.5 6L300 6l7.5 6L315 6l7.5 6L330 6l7.5 6L345 6l7.5 6L360 6l7.5 6L375 6l7.5 6L390 6l7.5 6L405 6l7.5 6L420 6l7.5 6L435 6l7.5 6L450 6l7.5 6L465 6l7.5 6L480 6l7.5 6L495 6l7.5 6L510 6l7.5 6L525 6l7.5 6L540 6l7.5 6L555 6l7.5 6L570 6l7.5 6L585 6l7.5 6L600 6V0z"
+            />
+          </svg>
+        </div>
+        <div className="relative z-[2] -mt-px px-2 sm:px-3">
+          <div
+            className={[
+              "h-0.5 w-full rounded-full",
+              prefersReducedMotion ? "bg-neutral-300" : "tear-off-perf",
+            ].join(" ")}
+          />
+          <p
+            className={[
+              "mt-1.5 text-center text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-400",
+              prefersReducedMotion ? "" : "animate-pulse",
+            ].join(" ")}
+          >
+            {"Perforated — lift corner to \"tear\""}
+          </p>
+        </div>
+
+        <div className="rounded-b-xl bg-white px-2 pb-8 pt-3 sm:px-3 sm:pb-10">
           <header className="mb-3 border-b border-neutral-200 pb-3">
             <div className="flex items-center justify-between gap-2">
               <h1 className="text-lg font-semibold tracking-tight text-neutral-900 sm:text-xl">{monthYear}</h1>
@@ -504,6 +541,18 @@ export default function WallCalendar() {
                 })}
               </div>
             </div>
+          </div>
+
+          <div
+            className="pointer-events-none absolute bottom-0 right-0 z-[3] h-[52px] w-[52px] sm:h-[58px] sm:w-[58px]"
+            aria-hidden
+          >
+            <div
+              className={[
+                "h-full w-full rounded-tl-md border-l border-t border-neutral-300/80 bg-gradient-to-br from-white via-neutral-50 to-neutral-100 shadow-[0_4px_12px_rgba(0,0,0,0.12)] [clip-path:polygon(100%_0,100%_100%,0_100%)]",
+                prefersReducedMotion ? "" : "tear-off-peel",
+              ].join(" ")}
+            />
           </div>
         </div>
       </div>
