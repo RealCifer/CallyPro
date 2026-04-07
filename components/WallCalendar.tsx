@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 
 const weekdayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -43,12 +43,46 @@ export function generateCalendarDays(month: number, year: number): CalendarDay[]
   return calendarDays;
 }
 
+const NOTES_STORAGE_KEY = "callypro:notesByRange";
+
+function toISODateKey(date: Date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function buildRangeKey(start: Date, end: Date) {
+  return `${toISODateKey(start)}_to_${toISODateKey(end)}`;
+}
+
+function safeReadNotesMap(): Record<string, string> {
+  if (globalThis.window === undefined) return {};
+  const raw = globalThis.window.localStorage.getItem(NOTES_STORAGE_KEY);
+  if (!raw) return {};
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return {};
+    return parsed as Record<string, string>;
+  } catch {
+    return {};
+  }
+}
+
+function safeWriteNotesMap(map: Record<string, string>) {
+  if (globalThis.window === undefined) return;
+  globalThis.window.localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(map));
+}
+
 export default function WallCalendar() {
   const now = new Date();
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+  const [notesText, setNotesText] = useState("");
+  const lastLoadedKeyRef = useRef<string | null>(null);
+  const saveTimerRef = useRef<number | null>(null);
   const monthYear = now.toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
@@ -94,6 +128,77 @@ export default function WallCalendar() {
     setEndDate(null);
   };
 
+  const activeRange = useMemo(() => {
+    if (!startDate && !endDate) return null;
+    const normalizedStart = startDate ? normalizeDate(startDate) : null;
+    const normalizedEnd = endDate ? normalizeDate(endDate) : null;
+
+    if (normalizedStart && normalizedEnd) return { start: normalizedStart, end: normalizedEnd };
+    if (normalizedStart) return { start: normalizedStart, end: normalizedStart };
+    if (normalizedEnd) return { start: normalizedEnd, end: normalizedEnd };
+    return null;
+  }, [startDate, endDate]);
+
+  const activeRangeKey = useMemo(() => {
+    if (!activeRange) return null;
+    return buildRangeKey(activeRange.start, activeRange.end);
+  }, [activeRange]);
+
+  const activeRangeLabel = useMemo(() => {
+    if (!activeRange) return null;
+    const startLabel = activeRange.start.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+    const endLabel = activeRange.end.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+    return startLabel === endLabel ? startLabel : `${startLabel} – ${endLabel}`;
+  }, [activeRange]);
+
+  const saveNotesForActiveRange = () => {
+    if (!activeRangeKey) return;
+    const map = safeReadNotesMap();
+    const trimmed = notesText.trim();
+    if (!trimmed) {
+      delete map[activeRangeKey];
+      safeWriteNotesMap(map);
+      return;
+    }
+    map[activeRangeKey] = notesText;
+    safeWriteNotesMap(map);
+  };
+
+  useEffect(() => {
+    if (!activeRangeKey) {
+      lastLoadedKeyRef.current = null;
+      setNotesText("");
+      return;
+    }
+
+    if (lastLoadedKeyRef.current === activeRangeKey) return;
+    const map = safeReadNotesMap();
+    setNotesText(map[activeRangeKey] ?? "");
+    lastLoadedKeyRef.current = activeRangeKey;
+  }, [activeRangeKey]);
+
+  useEffect(() => {
+    if (!activeRangeKey) return;
+
+    if (saveTimerRef.current) globalThis.clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = globalThis.setTimeout(() => {
+      saveNotesForActiveRange();
+    }, 500);
+
+    return () => {
+      if (saveTimerRef.current) globalThis.clearTimeout(saveTimerRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [notesText, activeRangeKey]);
+
   return (
     <section className="relative mx-auto w-full max-w-6xl rounded-3xl border border-neutral-200 bg-white p-4 shadow-[0_12px_26px_rgba(0,0,0,0.08)] sm:p-6 lg:p-8">
       <div className="pointer-events-none absolute -top-3 left-8 h-6 w-16 rounded-full border border-neutral-300 bg-neutral-100 shadow-sm" />
@@ -125,12 +230,48 @@ export default function WallCalendar() {
 
           <div className="grid gap-4 md:grid-cols-[180px_1fr]">
             <aside className="rounded-lg border border-neutral-200 bg-white p-3">
-              <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-neutral-700">
-                Notes
-              </h2>
+              <div className="mb-2 flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-700">
+                    Notes
+                  </h2>
+                  <p className="mt-0.5 text-xs text-neutral-500">
+                    {activeRangeLabel ? (
+                      <>
+                        For <span className="font-medium text-neutral-700">{activeRangeLabel}</span>
+                      </>
+                    ) : (
+                      "Select a date or range to add notes."
+                    )}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={saveNotesForActiveRange}
+                  disabled={!activeRangeKey}
+                  className={[
+                    "h-9 shrink-0 rounded-md px-3 text-sm font-medium transition-colors",
+                    activeRangeKey
+                      ? "bg-neutral-900 text-white hover:bg-neutral-800"
+                      : "cursor-not-allowed bg-neutral-100 text-neutral-400",
+                  ].join(" ")}
+                >
+                  Save
+                </button>
+              </div>
               <textarea
-                className="min-h-44 w-full resize-none rounded-md border border-neutral-200 bg-neutral-50 p-2 text-sm text-neutral-700 outline-none transition-shadow placeholder:text-neutral-400 focus:border-neutral-300 focus:ring-2 focus:ring-neutral-200"
-                placeholder="Write reminders, tasks, or ideas..."
+                value={notesText}
+                onChange={(e) => setNotesText(e.target.value)}
+                disabled={!activeRangeKey}
+                className={[
+                  "min-h-44 w-full resize-none rounded-md border p-2 text-sm outline-none transition-shadow placeholder:text-neutral-400",
+                  activeRangeKey
+                    ? "border-neutral-200 bg-neutral-50 text-neutral-700 focus:border-neutral-300 focus:ring-2 focus:ring-neutral-200"
+                    : "cursor-not-allowed border-neutral-200 bg-neutral-100 text-neutral-500",
+                ].join(" ")}
+                placeholder={
+                  activeRangeKey ? "Write reminders, tasks, or ideas..." : "Select a date or range first."
+                }
               />
             </aside>
 
