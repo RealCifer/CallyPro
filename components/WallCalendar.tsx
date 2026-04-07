@@ -10,6 +10,15 @@ type CalendarDay = {
   isCurrentMonth: boolean;
 };
 
+type AccentTheme = {
+  selected: string;
+  range: string;
+  today: string;
+  saveButton: string;
+  selectionBadge: string;
+  inputFocus: string;
+};
+
 export function generateCalendarDays(month: number, year: number): CalendarDay[] {
   const firstDayOfMonth = new Date(year, month, 1);
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -45,6 +54,45 @@ export function generateCalendarDays(month: number, year: number): CalendarDay[]
 
 const NOTES_STORAGE_KEY = "callypro:notesByRange";
 
+function getAccentTheme(month: number): AccentTheme {
+  const seasonalThemes: AccentTheme[] = [
+    {
+      selected: "border-rose-600 bg-rose-500 font-semibold text-white",
+      range: "border-rose-100 bg-rose-50 text-rose-800",
+      today: "border-rose-400 font-semibold text-rose-700",
+      saveButton: "bg-rose-600 text-white hover:bg-rose-500",
+      selectionBadge: "border-rose-200 bg-rose-50 text-rose-700",
+      inputFocus: "focus:border-rose-300 focus:ring-rose-200",
+    },
+    {
+      selected: "border-amber-600 bg-amber-500 font-semibold text-white",
+      range: "border-amber-100 bg-amber-50 text-amber-800",
+      today: "border-amber-400 font-semibold text-amber-700",
+      saveButton: "bg-amber-600 text-white hover:bg-amber-500",
+      selectionBadge: "border-amber-200 bg-amber-50 text-amber-700",
+      inputFocus: "focus:border-amber-300 focus:ring-amber-200",
+    },
+    {
+      selected: "border-emerald-600 bg-emerald-500 font-semibold text-white",
+      range: "border-emerald-100 bg-emerald-50 text-emerald-800",
+      today: "border-emerald-400 font-semibold text-emerald-700",
+      saveButton: "bg-emerald-600 text-white hover:bg-emerald-500",
+      selectionBadge: "border-emerald-200 bg-emerald-50 text-emerald-700",
+      inputFocus: "focus:border-emerald-300 focus:ring-emerald-200",
+    },
+    {
+      selected: "border-sky-600 bg-sky-500 font-semibold text-white",
+      range: "border-sky-100 bg-sky-50 text-sky-800",
+      today: "border-sky-400 font-semibold text-sky-700",
+      saveButton: "bg-sky-600 text-white hover:bg-sky-500",
+      selectionBadge: "border-sky-200 bg-sky-50 text-sky-700",
+      inputFocus: "focus:border-sky-300 focus:ring-sky-200",
+    },
+  ];
+
+  return seasonalThemes[month % seasonalThemes.length];
+}
+
 function toISODateKey(date: Date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -76,21 +124,27 @@ function safeWriteNotesMap(map: Record<string, string>) {
 
 export default function WallCalendar() {
   const now = new Date();
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
+  const [displayedDate, setDisplayedDate] = useState(
+    new Date(now.getFullYear(), now.getMonth(), 1),
+  );
+  const [isMonthAnimating, setIsMonthAnimating] = useState(false);
+  const [monthSlideDirection, setMonthSlideDirection] = useState<1 | -1>(1);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [notesText, setNotesText] = useState("");
   const lastLoadedKeyRef = useRef<string | null>(null);
   const saveTimerRef = useRef<number | null>(null);
-  const monthYear = now.toLocaleDateString("en-US", {
+  const displayedMonth = displayedDate.getMonth();
+  const displayedYear = displayedDate.getFullYear();
+  const accentTheme = getAccentTheme(displayedMonth);
+  const monthYear = displayedDate.toLocaleDateString("en-US", {
     month: "long",
     year: "numeric",
   });
-  const imageOverlayMonth = now
+  const imageOverlayMonth = displayedDate
     .toLocaleDateString("en-US", { month: "long", year: "numeric" })
     .toUpperCase();
-  const calendarDays = generateCalendarDays(currentMonth, currentYear);
+  const calendarDays = generateCalendarDays(displayedMonth, displayedYear);
 
   const normalizeDate = (date: Date) =>
     new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -128,6 +182,16 @@ export default function WallCalendar() {
     setEndDate(null);
   };
 
+  const handleMonthChange = (direction: 1 | -1) => {
+    if (isMonthAnimating) return;
+    setMonthSlideDirection(direction);
+    setIsMonthAnimating(true);
+    globalThis.setTimeout(() => {
+      setDisplayedDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + direction, 1));
+      setIsMonthAnimating(false);
+    }, 120);
+  };
+
   const activeRange = useMemo(() => {
     if (!startDate && !endDate) return null;
     const normalizedStart = startDate ? normalizeDate(startDate) : null;
@@ -158,6 +222,11 @@ export default function WallCalendar() {
     });
     return startLabel === endLabel ? startLabel : `${startLabel} – ${endLabel}`;
   }, [activeRange]);
+
+  let monthAnimationClass = "translate-x-0 opacity-100";
+  if (isMonthAnimating) {
+    monthAnimationClass = monthSlideDirection === 1 ? "translate-x-1 opacity-30" : "-translate-x-1 opacity-30";
+  }
 
   const saveNotesForActiveRange = () => {
     if (!activeRangeKey) return;
@@ -223,13 +292,40 @@ export default function WallCalendar() {
 
         <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4 shadow-[0_4px_14px_rgba(0,0,0,0.06)] sm:p-5">
           <header className="mb-4 border-b border-neutral-200 pb-3">
-            <h1 className="text-xl font-semibold tracking-tight text-neutral-900 sm:text-2xl">
-              {monthYear}
-            </h1>
+            <div className="flex items-center justify-between gap-3">
+              <h1 className="text-xl font-semibold tracking-tight text-neutral-900 sm:text-2xl">
+                {monthYear}
+              </h1>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleMonthChange(-1)}
+                  disabled={isMonthAnimating}
+                  className="h-9 w-9 rounded-md border border-neutral-200 bg-white text-neutral-700 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
+                  aria-label="Previous month"
+                >
+                  {"<"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleMonthChange(1)}
+                  disabled={isMonthAnimating}
+                  className="h-9 w-9 rounded-md border border-neutral-200 bg-white text-neutral-700 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
+                  aria-label="Next month"
+                >
+                  {">"}
+                </button>
+              </div>
+            </div>
           </header>
 
           <div className="grid gap-5 md:grid-cols-[1fr_220px] md:gap-4">
-            <div className="rounded-lg border border-neutral-200 bg-white p-3 sm:p-4">
+            <div
+              className={[
+                "rounded-lg border border-neutral-200 bg-white p-3 transition-all duration-200 sm:p-4",
+                monthAnimationClass,
+              ].join(" ")}
+            >
               <div className="mb-3 grid grid-cols-7 gap-2 sm:gap-3">
                 {weekdayLabels.map((label, weekdayIndex) => (
                   <div
@@ -269,22 +365,25 @@ export default function WallCalendar() {
                       type="button"
                       onClick={() => handleDateClick(date)}
                       className={[
-                        "aspect-square min-h-[44px] rounded-md border text-base transition-colors duration-150 md:min-h-0 md:text-sm",
+                        "relative aspect-square min-h-[44px] rounded-md border text-base transition duration-150 hover:scale-[1.03] active:scale-[0.98] md:min-h-0 md:text-sm",
                         isStartDate || isEndDate
-                          ? "border-blue-600 bg-blue-500 font-semibold text-white"
+                          ? accentTheme.selected
                           : "border-neutral-200 bg-white text-neutral-800 hover:bg-neutral-100",
-                        isInRange ? "border-blue-100 bg-blue-50 text-blue-800" : "",
+                        isInRange ? accentTheme.range : "",
                         isWeekend && !isToday && !isInRange && !isStartDate && !isEndDate
-                          ? "bg-neutral-50/70"
+                          ? "border-dashed bg-neutral-50/80"
                           : "",
                         isToday && !isStartDate && !isEndDate
-                          ? "border-blue-400 font-semibold text-blue-700"
+                          ? accentTheme.today
                           : "",
                         !isCurrentMonth && !isToday && !isStartDate && !isEndDate && !isInRange
                           ? "text-neutral-400"
                           : "",
                       ].join(" ")}
                     >
+                      {isWeekend && isCurrentMonth && (
+                        <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-neutral-300" />
+                      )}
                       {date.getDate()}
                     </button>
                   );
@@ -300,9 +399,14 @@ export default function WallCalendar() {
                   </h2>
                   <p className="mt-0.5 text-xs text-neutral-500">
                     {activeRangeLabel ? (
-                      <>
-                        For <span className="font-medium text-neutral-700">{activeRangeLabel}</span>
-                      </>
+                      <span
+                        className={[
+                          "inline-flex rounded-md border px-1.5 py-0.5 font-medium",
+                          accentTheme.selectionBadge,
+                        ].join(" ")}
+                      >
+                        {activeRangeLabel}
+                      </span>
                     ) : (
                       "Select a date or range to add notes."
                     )}
@@ -315,7 +419,7 @@ export default function WallCalendar() {
                   className={[
                     "h-9 shrink-0 rounded-md px-3 text-sm font-medium transition-colors",
                     activeRangeKey
-                      ? "bg-neutral-900 text-white hover:bg-neutral-800"
+                      ? accentTheme.saveButton
                       : "cursor-not-allowed bg-neutral-100 text-neutral-400",
                   ].join(" ")}
                 >
@@ -329,7 +433,7 @@ export default function WallCalendar() {
                 className={[
                   "min-h-40 w-full resize-none rounded-md border p-2 text-sm outline-none transition-shadow placeholder:text-neutral-400 sm:min-h-44",
                   activeRangeKey
-                    ? "border-neutral-200 bg-neutral-50 text-neutral-700 focus:border-neutral-300 focus:ring-2 focus:ring-neutral-200"
+                    ? `border-neutral-200 bg-neutral-50 text-neutral-700 focus:ring-2 ${accentTheme.inputFocus}`
                     : "cursor-not-allowed border-neutral-200 bg-neutral-100 text-neutral-500",
                 ].join(" ")}
                 placeholder={
