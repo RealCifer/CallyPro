@@ -288,51 +288,71 @@ export default function WallCalendar() {
   }, []);
 
   return (
-    <section className="relative mx-auto w-full max-w-6xl rounded-3xl border border-neutral-200 bg-white p-4 shadow-[0_12px_26px_rgba(0,0,0,0.08)] sm:p-6 lg:p-8">
-      <div className="pointer-events-none absolute -top-3 left-8 h-6 w-16 rounded-full border border-neutral-300 bg-neutral-100 shadow-sm" />
-      <div className="pointer-events-none absolute -top-3 right-8 h-6 w-16 rounded-full border border-neutral-300 bg-neutral-100 shadow-sm" />
-      <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:items-stretch">
-        <div className="relative min-h-64 overflow-hidden rounded-2xl bg-neutral-100 shadow-[0_6px_18px_rgba(0,0,0,0.1)] sm:min-h-80 lg:min-h-full">
-          <Image
-            src="/hero-placeholder.svg"
-            alt="Calendar hero placeholder"
-            fill
-            priority
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
-          <div className="pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rotate-12 bg-white/20" />
-          <div className="pointer-events-none absolute -top-20 right-14 h-52 w-52 rotate-45 border border-white/30 bg-white/10" />
-          <div className="absolute bottom-5 left-5 rounded-md bg-black/35 px-3 py-2 backdrop-blur-[1px]">
-            <p className="text-xs font-medium tracking-[0.2em] text-white/85">WALL CALENDAR</p>
-            <p className="text-lg font-semibold tracking-wide text-white sm:text-xl">{imageOverlayMonth}</p>
+    <section className="relative mx-auto w-full max-w-4xl px-3 py-8 sm:px-6">
+      <div className="mx-auto h-3 w-5 rounded-full border border-neutral-400 bg-neutral-200 shadow-sm" />
+      <div className="relative mt-2 rounded-2xl border border-neutral-200 bg-white p-3 shadow-[0_18px_40px_rgba(0,0,0,0.12)] sm:p-4">
+        <div className="pointer-events-none absolute -top-1 left-5 right-5 flex justify-between">
+          {Array.from({ length: 18 }).map((_, ring) => (
+            <span key={`ring-${ring + 1}`} className="h-2 w-0.5 rounded-full bg-neutral-700/70" />
+          ))}
+        </div>
+
+        <div className="relative min-h-64 overflow-hidden rounded-xl bg-neutral-100 sm:min-h-80">
+          <Image src="/mountain-hero.svg" alt="Mountain calendar hero" fill priority className="object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+          <div className="absolute -bottom-14 -left-3 h-36 w-[60%] bg-sky-500 [clip-path:polygon(0_32%,100%_0,100%_100%,0_100%)]" />
+          <div className="absolute -bottom-16 right-0 h-36 w-[56%] bg-sky-600 [clip-path:polygon(0_0,100%_30%,100%_100%,0_100%)]" />
+          <div className="absolute bottom-8 right-5 text-right">
+            <p className="text-xs font-semibold tracking-[0.18em] text-white/80">WALL CALENDAR</p>
+            <p className="text-xl font-semibold tracking-wide text-white sm:text-2xl">{imageOverlayMonth}</p>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4 shadow-[0_4px_14px_rgba(0,0,0,0.06)] sm:p-5">
-          <header className="mb-4 border-b border-neutral-200 pb-3">
-            <div className="flex items-center justify-between gap-3">
-              <h1 className="text-xl font-semibold tracking-tight text-neutral-900 sm:text-2xl">
-                {monthYear}
-              </h1>
-              <div className="flex items-center gap-2">
+        <div className="rounded-b-xl bg-white px-2 pb-2 pt-4 sm:px-3">
+          <header className="mb-3 border-b border-neutral-200 pb-3">
+            <div className="flex items-center justify-between gap-2">
+              <h1 className="text-lg font-semibold tracking-tight text-neutral-900 sm:text-xl">{monthYear}</h1>
+              <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   onClick={() => setFlipAnimationEnabled((prev) => !prev)}
                   className={[
-                    "inline-flex h-9 w-9 items-center justify-center rounded-md border border-neutral-200 bg-white text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 md:hidden",
+                    "inline-flex h-8 w-8 items-center justify-center rounded-md border border-neutral-200 bg-white text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-100 md:hidden",
                     prefersReducedMotion ? "opacity-60" : "",
                   ].join(" ")}
                   aria-label={flipAnimationEnabled ? "Disable flip animation" : "Enable flip animation"}
                   title={flipAnimationEnabled ? "Flip on" : "Flip off"}
                 >
-                  {flipAnimationEnabled ? "F" : "f"}
+                  <svg
+                    viewBox="0 0 20 20"
+                    aria-hidden="true"
+                    className="h-4 w-4"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M4.5 5.5H15.5V14.5H4.5V5.5Z"
+                      className={flipAnimationEnabled ? "stroke-current" : "stroke-neutral-400"}
+                      strokeWidth="1.4"
+                    />
+                    <path
+                      d="M10 5.5V14.5"
+                      className={flipAnimationEnabled ? "stroke-current" : "stroke-neutral-400"}
+                      strokeWidth="1.2"
+                      strokeDasharray={flipAnimationEnabled ? "0" : "2 2"}
+                    />
+                    <path
+                      d="M10 5.5C11.9 6.4 13.4 7.4 15.5 9.2"
+                      className={flipAnimationEnabled ? "stroke-current" : "stroke-neutral-400"}
+                      strokeWidth="1.1"
+                    />
+                  </svg>
                 </button>
                 <button
                   type="button"
                   onClick={() => setFlipAnimationEnabled((prev) => !prev)}
                   className={[
-                    "hidden h-9 rounded-md border border-neutral-200 bg-white px-3 text-xs font-medium text-neutral-700 transition-colors hover:bg-neutral-100 md:inline-flex md:items-center",
+                    "hidden h-8 rounded-md border border-neutral-200 bg-white px-3 text-xs font-medium text-neutral-700 transition-colors hover:bg-neutral-100 md:inline-flex md:items-center",
                     prefersReducedMotion ? "opacity-60" : "",
                   ].join(" ")}
                 >
@@ -342,7 +362,7 @@ export default function WallCalendar() {
                   type="button"
                   onClick={() => handleMonthChange(-1)}
                   disabled={isMonthAnimating}
-                  className="h-9 w-9 rounded-md border border-neutral-200 bg-white text-neutral-700 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="h-8 w-8 rounded-md border border-neutral-200 bg-white text-neutral-700 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label="Previous month"
                 >
                   {"<"}
@@ -351,7 +371,7 @@ export default function WallCalendar() {
                   type="button"
                   onClick={() => handleMonthChange(1)}
                   disabled={isMonthAnimating}
-                  className="h-9 w-9 rounded-md border border-neutral-200 bg-white text-neutral-700 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="h-8 w-8 rounded-md border border-neutral-200 bg-white text-neutral-700 transition-colors hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label="Next month"
                 >
                   {">"}
@@ -360,7 +380,58 @@ export default function WallCalendar() {
             </div>
           </header>
 
-          <div className="grid gap-5 md:grid-cols-[1fr_220px] md:gap-4">
+          <div className="grid gap-4 md:grid-cols-[170px_1fr] md:gap-5">
+            <aside className="rounded-lg border border-neutral-200 bg-white p-3 sm:p-4">
+              <div className="mb-2 flex items-start justify-between gap-2">
+                <div>
+                  <h2 className="text-[11px] font-semibold uppercase tracking-[0.15em] text-neutral-700">
+                    Notes
+                  </h2>
+                  <p className="mt-1 text-[11px] text-neutral-500">
+                    {activeRangeLabel ? (
+                      <span
+                        className={[
+                          "inline-flex rounded-md border px-1.5 py-0.5 font-medium",
+                          accentTheme.selectionBadge,
+                        ].join(" ")}
+                      >
+                        {activeRangeLabel}
+                      </span>
+                    ) : (
+                      "Select a date or range"
+                    )}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={saveNotesForActiveRange}
+                  disabled={!activeRangeKey}
+                  className={[
+                    "h-8 shrink-0 rounded-md px-2.5 text-xs font-medium transition-colors",
+                    activeRangeKey
+                      ? accentTheme.saveButton
+                      : "cursor-not-allowed bg-neutral-100 text-neutral-400",
+                  ].join(" ")}
+                >
+                  Save
+                </button>
+              </div>
+              <textarea
+                value={notesText}
+                onChange={(e) => setNotesText(e.target.value)}
+                disabled={!activeRangeKey}
+                className={[
+                  "min-h-40 w-full resize-none rounded-md border p-2 text-sm outline-none transition-shadow placeholder:text-neutral-400 sm:min-h-44",
+                  activeRangeKey
+                    ? `border-neutral-200 bg-neutral-50 text-neutral-700 focus:ring-2 ${accentTheme.inputFocus}`
+                    : "cursor-not-allowed border-neutral-200 bg-neutral-100 text-neutral-500",
+                ].join(" ")}
+                placeholder={
+                  activeRangeKey ? "Write reminders, tasks, or ideas..." : "Select a date or range first."
+                }
+              />
+            </aside>
+
             <div
               className={[
                 "rounded-lg border border-neutral-200 bg-white p-3 transition-all duration-200 will-change-transform sm:p-4",
@@ -433,57 +504,6 @@ export default function WallCalendar() {
                 })}
               </div>
             </div>
-
-            <aside className="rounded-lg border border-neutral-200 bg-white p-3 sm:p-4">
-              <div className="mb-2 flex items-start justify-between gap-3">
-                <div>
-                  <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-700">
-                    Notes
-                  </h2>
-                  <p className="mt-0.5 text-xs text-neutral-500">
-                    {activeRangeLabel ? (
-                      <span
-                        className={[
-                          "inline-flex rounded-md border px-1.5 py-0.5 font-medium",
-                          accentTheme.selectionBadge,
-                        ].join(" ")}
-                      >
-                        {activeRangeLabel}
-                      </span>
-                    ) : (
-                      "Select a date or range to add notes."
-                    )}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={saveNotesForActiveRange}
-                  disabled={!activeRangeKey}
-                  className={[
-                    "h-9 shrink-0 rounded-md px-3 text-sm font-medium transition-colors",
-                    activeRangeKey
-                      ? accentTheme.saveButton
-                      : "cursor-not-allowed bg-neutral-100 text-neutral-400",
-                  ].join(" ")}
-                >
-                  Save
-                </button>
-              </div>
-              <textarea
-                value={notesText}
-                onChange={(e) => setNotesText(e.target.value)}
-                disabled={!activeRangeKey}
-                className={[
-                  "min-h-40 w-full resize-none rounded-md border p-2 text-sm outline-none transition-shadow placeholder:text-neutral-400 sm:min-h-44",
-                  activeRangeKey
-                    ? `border-neutral-200 bg-neutral-50 text-neutral-700 focus:ring-2 ${accentTheme.inputFocus}`
-                    : "cursor-not-allowed border-neutral-200 bg-neutral-100 text-neutral-500",
-                ].join(" ")}
-                placeholder={
-                  activeRangeKey ? "Write reminders, tasks, or ideas..." : "Select a date or range first."
-                }
-              />
-            </aside>
           </div>
         </div>
       </div>
