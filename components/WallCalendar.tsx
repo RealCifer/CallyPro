@@ -48,12 +48,15 @@ export default function WallCalendar() {
     month: "long",
     year: "numeric",
   });
+  const imageOverlayMonth = now
+    .toLocaleDateString("en-US", { month: "long", year: "numeric" })
+    .toUpperCase();
   const calendarDays = generateCalendarDays(currentMonth, currentYear);
 
   return (
-    <section className="mx-auto w-full max-w-6xl rounded-2xl bg-white p-4 shadow-[0_10px_30px_rgba(0,0,0,0.08)] sm:p-6 lg:p-8">
-      <div className="grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:items-stretch">
-        <div className="relative min-h-56 overflow-hidden rounded-xl bg-neutral-100 sm:min-h-72 lg:min-h-full">
+    <section className="mx-auto w-full max-w-6xl rounded-3xl border border-neutral-200 bg-white p-4 shadow-[0_12px_26px_rgba(0,0,0,0.08)] sm:p-6 lg:p-8">
+      <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr] lg:items-stretch">
+        <div className="relative min-h-64 overflow-hidden rounded-2xl bg-neutral-100 shadow-[0_6px_18px_rgba(0,0,0,0.1)] sm:min-h-80 lg:min-h-full">
           <Image
             src="/hero-placeholder.svg"
             alt="Calendar hero placeholder"
@@ -61,9 +64,16 @@ export default function WallCalendar() {
             priority
             className="object-cover"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+          <div className="pointer-events-none absolute -bottom-24 -left-24 h-64 w-64 rotate-12 bg-white/20" />
+          <div className="pointer-events-none absolute -top-20 right-14 h-52 w-52 rotate-45 border border-white/30 bg-white/10" />
+          <div className="absolute bottom-5 left-5 rounded-md bg-black/35 px-3 py-2 backdrop-blur-[1px]">
+            <p className="text-xs font-medium tracking-[0.2em] text-white/85">WALL CALENDAR</p>
+            <p className="text-lg font-semibold tracking-wide text-white sm:text-xl">{imageOverlayMonth}</p>
+          </div>
         </div>
 
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 sm:p-5">
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4 shadow-[0_4px_14px_rgba(0,0,0,0.06)] sm:p-5">
           <header className="mb-4 border-b border-neutral-200 pb-3">
             <h1 className="text-xl font-semibold tracking-tight text-neutral-900 sm:text-2xl">
               {monthYear}
@@ -71,15 +81,14 @@ export default function WallCalendar() {
           </header>
 
           <div className="grid gap-4 md:grid-cols-[180px_1fr]">
-            <aside className="rounded-lg border border-dashed border-neutral-300 bg-white p-3">
+            <aside className="rounded-lg border border-neutral-200 bg-white p-3">
               <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-neutral-700">
                 Notes
               </h2>
-              <div className="space-y-2">
-                {Array.from({ length: 7 }).map((_, noteLine) => (
-                  <div key={`note-line-${noteLine + 1}`} className="h-5 rounded bg-neutral-100" />
-                ))}
-              </div>
+              <textarea
+                className="min-h-44 w-full resize-none rounded-md border border-neutral-200 bg-neutral-50 p-2 text-sm text-neutral-700 outline-none transition-shadow placeholder:text-neutral-400 focus:border-neutral-300 focus:ring-2 focus:ring-neutral-200"
+                placeholder="Write reminders, tasks, or ideas..."
+              />
             </aside>
 
             <div className="rounded-lg border border-neutral-200 bg-white p-3">
@@ -106,10 +115,10 @@ export default function WallCalendar() {
                       key={date.toISOString()}
                       type="button"
                       className={[
-                        "aspect-square rounded-md border text-sm transition-colors",
+                        "aspect-square rounded-md border text-sm transition-colors duration-150",
                         isToday
                           ? "border-blue-400 bg-blue-50 font-semibold text-blue-700"
-                          : "border-neutral-200 bg-neutral-50 text-neutral-800 hover:bg-neutral-100",
+                          : "border-neutral-200 bg-white text-neutral-800 hover:bg-neutral-100",
                         !isCurrentMonth && !isToday ? "text-neutral-400" : "",
                       ].join(" ")}
                     >
