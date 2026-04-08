@@ -1,8 +1,27 @@
+"use client";
+
+import { useState } from "react";
 import WallCalendar from "@/components/WallCalendar";
 
 export default function Home() {
+  const [darkMode, setDarkMode] = useState(() => {
+    if (globalThis.window === undefined) return false;
+    return globalThis.window.localStorage.getItem("callypro:theme") === "dark";
+  });
+
+  const toggleTheme = () => {
+    const next = !darkMode;
+    setDarkMode(next);
+    globalThis.window.localStorage.setItem("callypro:theme", next ? "dark" : "light");
+  };
+
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#dff2ff] px-4 py-8 sm:px-6 sm:py-10 lg:px-10">
+    <main
+      className={[
+        "relative min-h-screen overflow-hidden px-4 py-8 sm:px-6 sm:py-10 lg:px-10",
+        darkMode ? "bg-[#0b1b2c]" : "bg-[#dff2ff]",
+      ].join(" ")}
+    >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_-10%,rgba(255,255,255,0.95)_0%,rgba(207,235,255,0.75)_35%,rgba(132,199,246,0.5)_70%,rgba(87,163,227,0.42)_100%)] bg-sky-drift" />
       <div className="pointer-events-none absolute -top-16 left-0 right-0 h-52 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.88),rgba(255,255,255,0.1),transparent)]" />
       <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-[46vh] bg-[linear-gradient(to_top,rgba(24,108,179,0.62),rgba(55,140,205,0.38),transparent)]" />
@@ -67,8 +86,23 @@ export default function Home() {
         </svg>
       </div>
 
+      <div className="relative z-20 mb-4 flex justify-end">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className={[
+            "rounded-full border px-4 py-2 text-sm font-medium shadow-sm transition",
+            darkMode
+              ? "border-slate-600 bg-slate-800 text-slate-100 hover:bg-slate-700"
+              : "border-white/70 bg-white/85 text-slate-700 hover:bg-white",
+          ].join(" ")}
+        >
+          {darkMode ? "Switch to Light" : "Switch to Dark"}
+        </button>
+      </div>
+
       <div className="relative z-10">
-        <WallCalendar />
+        <WallCalendar darkMode={darkMode} />
       </div>
     </main>
   );
