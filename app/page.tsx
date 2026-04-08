@@ -15,17 +15,56 @@ export default function Home() {
       <div className="pointer-events-none absolute right-[10%] top-[18%] h-20 w-48 rounded-full bg-white/55 blur-2xl sm:h-24 sm:w-64" />
       <div className="pointer-events-none absolute left-1/2 top-[26%] h-16 w-44 -translate-x-1/2 rounded-full bg-white/40 blur-2xl sm:h-20 sm:w-64" />
 
-      <div className="pointer-events-none absolute left-[14%] top-[9%] hidden h-10 w-10 items-center justify-center rounded-xl border border-white/70 bg-white/85 text-lg shadow-[0_8px_18px_rgba(0,0,0,0.15)] float-card md:flex">
-        ✨
+      <div className="pointer-events-none absolute left-[22%] top-[19%] hidden opacity-65 md:block">
+        <svg viewBox="0 0 120 44" className="h-7 w-20 text-sky-700/55" fill="none" aria-hidden="true">
+          <path d="M10 28c6-10 16-10 22 0M33 28c6-9 16-9 22 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          <path d="M60 18c5-8 12-8 18 0M78 18c5-8 12-8 18 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
       </div>
-      <div className="pointer-events-none absolute left-[30%] top-[13%] hidden h-10 w-10 items-center justify-center rounded-xl border border-white/70 bg-white/85 text-lg shadow-[0_8px_18px_rgba(0,0,0,0.15)] [animation-delay:0.7s] float-card md:flex">
-        🧠
+      <div className="pointer-events-none absolute right-[18%] top-[24%] hidden opacity-55 md:block">
+        <svg viewBox="0 0 120 44" className="h-6 w-16 text-sky-800/50" fill="none" aria-hidden="true">
+          <path d="M14 24c5-8 12-8 18 0M32 24c5-8 12-8 18 0" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+          <path d="M52 16c4-7 10-7 14 0M66 16c4-7 10-7 14 0" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        </svg>
       </div>
-      <div className="pointer-events-none absolute right-[22%] top-[11%] hidden h-10 w-10 items-center justify-center rounded-xl border border-white/70 bg-white/85 text-lg shadow-[0_8px_18px_rgba(0,0,0,0.15)] [animation-delay:1.1s] float-card md:flex">
-        📅
+
+      <div className="pointer-events-none absolute left-[14%] top-[9%] hidden h-10 w-10 items-center justify-center rounded-xl border border-white/70 bg-white/85 shadow-[0_8px_18px_rgba(0,0,0,0.15)] float-card md:flex">
+        <svg viewBox="0 0 20 20" className="h-5 w-5 text-sky-500" fill="none" aria-hidden="true">
+          <path
+            d="M10 2.5L11.8 8.2L17.5 10L11.8 11.8L10 17.5L8.2 11.8L2.5 10L8.2 8.2L10 2.5Z"
+            stroke="currentColor"
+            strokeWidth="1.3"
+            strokeLinejoin="round"
+          />
+        </svg>
       </div>
-      <div className="pointer-events-none absolute right-[10%] top-[16%] hidden h-10 w-10 items-center justify-center rounded-xl border border-white/70 bg-white/85 text-lg shadow-[0_8px_18px_rgba(0,0,0,0.15)] [animation-delay:1.7s] float-card md:flex">
-        🌿
+      <div className="pointer-events-none absolute left-[30%] top-[13%] hidden h-10 w-10 items-center justify-center rounded-xl border border-white/70 bg-white/85 shadow-[0_8px_18px_rgba(0,0,0,0.15)] [animation-delay:0.7s] float-card md:flex">
+        <svg viewBox="0 0 20 20" className="h-5 w-5 text-violet-500" fill="none" aria-hidden="true">
+          <path
+            d="M7.2 6.2A2.7 2.7 0 0 1 9.9 3.5h.2a2.7 2.7 0 0 1 2.7 2.7v.3a2.2 2.2 0 0 1 1.8 2.2 2.2 2.2 0 0 1-.7 1.6 2 2 0 0 1 .7 1.5A2.2 2.2 0 0 1 12.4 14h-.2a2.2 2.2 0 0 1-2.2 2H9.8a2.2 2.2 0 0 1-2.2-2H7.4A2.2 2.2 0 0 1 5.2 12a2 2 0 0 1 .7-1.5 2.2 2.2 0 0 1-.7-1.6 2.2 2.2 0 0 1 2-2.2V6.2Z"
+            stroke="currentColor"
+            strokeWidth="1.3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </div>
+      <div className="pointer-events-none absolute right-[22%] top-[11%] hidden h-10 w-10 items-center justify-center rounded-xl border border-white/70 bg-white/85 shadow-[0_8px_18px_rgba(0,0,0,0.15)] [animation-delay:1.1s] float-card md:flex">
+        <svg viewBox="0 0 20 20" className="h-5 w-5 text-emerald-500" fill="none" aria-hidden="true">
+          <rect x="3.2" y="4.6" width="13.6" height="11.8" rx="2" stroke="currentColor" strokeWidth="1.3" />
+          <path d="M3.2 8.3H16.8M6.5 2.9V6M13.5 2.9V6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+        </svg>
+      </div>
+      <div className="pointer-events-none absolute right-[10%] top-[16%] hidden h-10 w-10 items-center justify-center rounded-xl border border-white/70 bg-white/85 shadow-[0_8px_18px_rgba(0,0,0,0.15)] [animation-delay:1.7s] float-card md:flex">
+        <svg viewBox="0 0 20 20" className="h-5 w-5 text-teal-500" fill="none" aria-hidden="true">
+          <path
+            d="M10 16.6V9.5M10 9.5C10 6 12.4 4 15.6 3.4C15.6 7.7 13.6 10 10 10M10 9.5C10 6.5 8.1 4.7 4.4 4.1C4.4 8.2 6.5 10.2 10 10"
+            stroke="currentColor"
+            strokeWidth="1.3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
       </div>
 
       <div className="relative z-10">
