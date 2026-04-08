@@ -78,10 +78,40 @@ body {
   animation: tear-edge-wiggle 3.5s ease-in-out infinite;
 }
 
+@keyframes sky-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -8px, 0) scale(1.01);
+  }
+}
+
+@keyframes float-card {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+}
+
+.bg-sky-drift {
+  animation: sky-drift 16s ease-in-out infinite;
+}
+
+.float-card {
+  animation: float-card 4.8s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .tear-off-peel,
   .tear-off-perf,
-  .tear-off-edge-wiggle {
+  .tear-off-edge-wiggle,
+  .bg-sky-drift,
+  .float-card {
     animation: none;
   }
 }
