@@ -92,8 +92,8 @@ export default function WallCalendar({ darkMode = false }: WallCalendarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const saveTimerRef = useRef<number | null>(null);
-  const toastTimerRef = useRef<number | null>(null);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [displayedDate, setDisplayedDate] = useState(() => {
     if (globalThis.window === undefined) return new Date(now.getFullYear(), now.getMonth(), 1);
     const fromUrl = parseMonthParam(new URLSearchParams(globalThis.window.location.search).get("month"));
