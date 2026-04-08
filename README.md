@@ -90,10 +90,7 @@ The component is optimized for multiple screen sizes:
 - **Mobile:** vertical flow that prioritizes readability, touch-friendly targets, and spacing
 - Tailwind breakpoints are used to adapt spacing, typography, and grid behavior across viewport sizes
 
-## Future Improvements
+## Author
+Aditya Khamait
 
-- Add richer month transition animations and optional interaction presets
-- Expand theme customization (accent palettes and advanced dark mode controls)
-- Add user-defined events and reminders with labels and categories
-- Integrate backend persistence for cross-device sync and authentication
-- Add end-to-end interaction tests for production hardening
+
