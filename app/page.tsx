@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Suspense } from "react";
 import WallCalendar from "@/components/WallCalendar";
 
 export default function Home() {
@@ -102,7 +103,9 @@ export default function Home() {
       </div>
 
       <div className="relative z-10">
-        <WallCalendar darkMode={darkMode} />
+        <Suspense fallback={<div className="mx-auto h-[520px] w-full max-w-4xl rounded-2xl bg-white/60" />}>
+          <WallCalendar darkMode={darkMode} />
+        </Suspense>
       </div>
     </main>
   );
